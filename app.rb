@@ -1,5 +1,3 @@
-# app.rb
-
 require 'json'
 
 class ClientManager
@@ -7,8 +5,15 @@ class ClientManager
     @clients = JSON.parse(data)
   end
 
-  def search_clients(query)
-    @clients.select { |client| client['full_name'].downcase.include?(query.downcase) }
+  def search_clients(query, fields = ['full_name'])
+    if fields.is_a?(Array)
+      results = @clients.select do |client|
+        fields.any? { |field| client[field].to_s.downcase.include?(query.downcase) }
+      end
+    else
+      results = @clients.select { |client| client[fields].to_s.downcase.include?(query.downcase) }
+    end
+    results
   end
 
   def find_duplicate_emails
@@ -19,13 +24,14 @@ class ClientManager
   end
 end
 
+
 class CommandLineInterface
   def initialize(data)
     @manager = ClientManager.new(data)
   end
 
-  def search_clients(query)
-    results = @manager.search_clients(query)
+  def search_clients(query, field = 'full_name')
+    results = @manager.search_clients(query, field)
     if results.empty?
       puts "No clients found."
     else
@@ -58,7 +64,8 @@ if __FILE__ == $0
   cli = CommandLineInterface.new(json_data)
 
   # Example usage
+  puts 'Searching for clients with name containing "John":'
   cli.search_clients("John")
+  puts "\nFinding duplicate emails:"
   cli.find_duplicate_emails
 end
-
