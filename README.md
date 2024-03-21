@@ -51,6 +51,8 @@ rspec
 ```
 This command will run all test files in the spec directory and report the results.
 
+Note: To satisfy other unit tests, run `ruby scripts/remove_duplicates.rb`
+
 ## Future Expansion
 
 The application is designed to accommodate future expansions such as:
